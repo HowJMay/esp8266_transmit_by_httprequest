@@ -27,8 +27,10 @@ import java.net.URISyntaxException;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    public final static String PREF_IP = "PREF_ADDRESS";
-    public final static String PREF_PORT = "PREF_PORT_NUMBER";
+    // The codes are from  https://www.youtube.com/watch?v=li4bN1N6ifA&list=PLmfT_cdP5PYDRYIvGIQ4YQYnEprshtxO8&index=7
+
+    public final static String PREF_IP = "192.168.43.150";
+    public final static String PREF_PORT = "80";
     private Button buttonPin11,buttonPin12,buttonPin13;
     private EditText editTextIPAddress, editTextPortNumber;
 
@@ -47,9 +49,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonPin12 = (Button) findViewById(R.id.buttonPin12);
         buttonPin13 = (Button) findViewById(R.id.buttonPin13);
 
+        // assign text inputs
+        editTextIPAddress = (EditText)findViewById(R.id.editTextIPAddress);
+        editTextPortNumber = (EditText)findViewById(R.id.editTextPortNumber);
+
         buttonPin11.setOnClickListener(this);
         buttonPin12.setOnClickListener(this);
         buttonPin13.setOnClickListener(this);
+
+        // get the IP address and port number from the last time the user used the app,
+        // put an empty string "" is this is the first time.
+        editTextIPAddress.setText(sharedPreferences.getString(PREF_IP,""));
+        editTextPortNumber.setText(sharedPreferences.getString(PREF_PORT,""));
     }
 
     @Override
