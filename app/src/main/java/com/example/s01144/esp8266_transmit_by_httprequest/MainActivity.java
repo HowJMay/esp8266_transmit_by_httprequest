@@ -22,8 +22,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -87,9 +90,73 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         // execute HTTP request
         if (ipAddress.length() > 0 && portNumber.length() > 0){
-            new HttpRequestAsyncTask(view.getContext(), parameterValue, ipAddress, portNumber, "pin").execute();
+            //new HttpRequestAsyncTask(view.getContext(), parameterValue, ipAddress, portNumber, "pin").execute();
+            new Task().execute(ipAddress, portNumber, "pin", parameterValue);
         }
     }
+
+    public class Task extends AsyncTask<String, Void, String>{
+        @Override
+        protected String doInBackground(String... strings) {
+            URL website = null;
+            BufferedReader bufferedReader = null;
+            StringBuilder stringBuilder;
+
+            String ipAddress = strings[0];
+            String portNumber = strings[1];
+            String parameterName = strings[2];
+            String parameterValue = strings[3];
+
+            try {
+                website = new URL("http://" + ipAddress + ":" + portNumber + "/?" + parameterName + "=" + parameterValue);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) website.openConnection();
+
+                httpURLConnection.setRequestMethod("GET");
+
+                httpURLConnection.setConnectTimeout(10*1000);
+                httpURLConnection.connect();
+
+                bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+                stringBuilder = new StringBuilder();
+
+                String line = null;
+                while ((line = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(line + "\n");
+                }
+                return stringBuilder.toString();
+
+
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+            finally {
+                if (bufferedReader != null) {
+                    try {
+                        bufferedReader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (!"".equals(s) || null != s) {
+                editTextPortNumber.setText(s);
+            }
+        }
+    }
+
+
+
+
     /**
          * Description: Send an HTTP Get request to a specified ip address and port.
          * Also send a parameter "parameterName" with the value of "parameterValue".
@@ -100,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          * @return The ip address' reply text, or an ERROR message is it fails to receive one
          */
     public String sendRequest(String parameterValue, String ipAddress, String portNumber, String parameterName){
+
         String serverResponse = "ERROR";
 
         try {
@@ -107,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             HttpClient httpClient = new DefaultHttpClient(); // create an HTTP client
             // define the URL e.g. http://myIpaddress:myport/?pin=13 (to toggle pin 13 for example)
             URI website = new URI("http://" + ipAddress + ":" + portNumber + "/?" + parameterName + "=" + parameterValue);
+
             HttpGet getRequest = new HttpGet();// create an HTTP GET object
             getRequest.setURI(website);// set the URL of the GET request
             HttpResponse response = httpClient.execute(getRequest); // execute the request
