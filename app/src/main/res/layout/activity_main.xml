@@ -7,7 +7,8 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="1">
 
 
         <TextView
@@ -20,8 +21,6 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="e.g. 192.168.0.10"
-
             android:id="@+id/editTextIPAddress" />
 
         <TextView
@@ -35,27 +34,43 @@
             android:layout_height="wrap_content"
             android:inputType="number"
             android:ems="10"
-
-            android:text="80"
             android:id="@+id/editTextPortNumber" />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Pin 11"
-            android:id="@+id/buttonPin11" />
+            android:text="Level HIGH"
+            android:id="@+id/high" />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Pin 12"
-            android:id="@+id/buttonPin12" />
+            android:text="Level MEDIUM"
+            android:id="@+id/medium" />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Pin 13"
-            android:id="@+id/buttonPin13" />
+            android:text="Level LOW"
+            android:id="@+id/low" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AUTO"
+            android:id="@+id/auto" />
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:id="@+id/seekbar"
+            android:max="100"
+            android:progress="50" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Send Customed Value"
+            android:id="@+id/send"/>
     </LinearLayout>
 
 </ScrollView>

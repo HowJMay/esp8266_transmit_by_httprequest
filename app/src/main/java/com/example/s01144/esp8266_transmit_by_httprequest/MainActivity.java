@@ -11,6 +11,8 @@ import android.view.View;
 import android.webkit.ClientCertRequest;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SeekBar;
+import android.widget.Toast;
 
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -27,13 +29,13 @@ import java.net.URISyntaxException;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    // The codes are from  https://www.youtube.com/watch?v=li4bN1N6ifA&list=PLmfT_cdP5PYDRYIvGIQ4YQYnEprshtxO8&index=7
 
-    public final static String PREF_IP = "192.168.43.150";
+
+    public final static String PREF_IP = "192.168.4.1";
     public final static String PREF_PORT = "80";
-    private Button buttonPin11,buttonPin12,buttonPin13;
+    private Button buttonHIGH, buttonMEDIUM, buttonLOW, buttonAUTO, buttonSend;
     private EditText editTextIPAddress, editTextPortNumber;
-
+    private SeekBar seekBar;
     SharedPreferences.Editor editor;
     SharedPreferences sharedPreferences;
 
@@ -45,17 +47,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sharedPreferences = getSharedPreferences("HTTP_HELPER_PREFS", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
-        buttonPin11 = (Button) findViewById(R.id.buttonPin11);
-        buttonPin12 = (Button) findViewById(R.id.buttonPin12);
-        buttonPin13 = (Button) findViewById(R.id.buttonPin13);
+        buttonHIGH = (Button) findViewById(R.id.high);
+        buttonMEDIUM = (Button) findViewById(R.id.medium);
+        buttonLOW = (Button) findViewById(R.id.low);
+        buttonAUTO = (Button) findViewById(R.id.auto);
+        buttonSend = (Button) findViewById(R.id.send);
+
+
+        seekBar = (SeekBar) findViewById(R.id.seekbar);
+        seekBar.setOnSeekBarChangeListener(seekBarOnSeekBarChange);
 
         // assign text inputs
         editTextIPAddress = (EditText)findViewById(R.id.editTextIPAddress);
+        editTextIPAddress.setText("192.168.4.1");
         editTextPortNumber = (EditText)findViewById(R.id.editTextPortNumber);
+        editTextPortNumber.setText("80");
 
-        buttonPin11.setOnClickListener(this);
-        buttonPin12.setOnClickListener(this);
-        buttonPin13.setOnClickListener(this);
+        buttonHIGH.setOnClickListener(this);
+        buttonMEDIUM.setOnClickListener(this);
+        buttonLOW.setOnClickListener(this);
 
         // get the IP address and port number from the last time the user used the app,
         // put an empty string "" is this is the first time.
@@ -72,15 +82,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editor.putString(PREF_IP, ipAddress);
         editor.putString(PREF_PORT, portNumber);
 
+        int speed = 0;
         switch (view.getId()){
-            case R.id.buttonPin11:
-                parameterValue = "11";
+            case R.id.high:
+                parameterValue = "high";
+                speed = 100;
                 break;
-            case R.id.buttonPin12:
-                parameterValue = "12";
+            case R.id.medium:
+                parameterValue = "medium";
+                speed = 50;
                 break;
-            case R.id.buttonPin13:
-                parameterValue = "13";
+            case R.id.low:
+                parameterValue = "low";
+                speed = 10;
+                break;
+            case R.id.auto:
+                parameterValue = "auto";
+                speed = 80;
+                break;
+            case R.id.send:
+                parameterValue = "send";
+                speed = seekBar.getProgress();
                 break;
             default:
                 break;
@@ -90,6 +112,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             new HttpRequestAsyncTask(view.getContext(), parameterValue, ipAddress, portNumber, "pin").execute();
         }
     }
+
+    private SeekBar.OnSeekBarChangeListener seekBarOnSeekBarChange = new SeekBar.OnSeekBarChangeListener()
+    {
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar)
+        {
+            //停止拖曳時觸發事件
+            Toast.makeText(MainActivity.this, Integer.toString(seekBar.getProgress()), Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar)
+        {
+            //開始拖曳時觸發事件
+        }
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+        {
+            //拖曳途中觸發事件，回傳參數 progress 告知目前拖曳數值
+
+        }
+    };
+
+
     /**
          * Description: Send an HTTP Get request to a specified ip address and port.
          * Also send a parameter "parameterName" with the value of "parameterValue".
